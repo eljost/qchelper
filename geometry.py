@@ -4,7 +4,7 @@ from pandas import DataFrame
 import chemcoord as cc
 
 
-def make_xyz_str(atoms, coords):
+def make_xyz_str(atoms, coords, comment=""):
     assert(len(atoms) == len(coords))
 
     coord_fmt = "{: 03.8f}"
@@ -15,7 +15,7 @@ def make_xyz_str(atoms, coords):
             in zip(atoms, coords)]
     body = "\n".join(body)
  
-    return "{}\n\n{}".format(len(atoms), body)
+    return "{}\n{}\n{}".format(len(atoms), comment, body)
 
 
 def make_trj_str(atoms, coords_list):

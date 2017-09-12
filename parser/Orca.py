@@ -49,7 +49,13 @@ class Orca(Parser):
     def parse_mayer(self):
         mayer_re = "Mayer bond orders larger than 0.1\s*(.+?)\n\n"
         matches = re.search(mayer_re, self.text, re.DOTALL)
-        print(matches.groups()[0].split())
+        #print(matches.groups()[0].split())
         #matches = [m.strip() for m in matches.groups()[1split(":")
         
         return matches
+
+    def parse_tddft_table(self):
+        transition_dipole_re = "TRANSITION ELECTRIC.+?TZ(.+?)\n\n"
+        mobj = re.search(transition_dipole_re, self.text, re.DOTALL)
+        table_lines = mobj.groups()[0].split("\n")[3:]
+        return [l.split() for l in table_lines]
