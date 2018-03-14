@@ -14,12 +14,15 @@ def plot_scan(energies, coordinates=None):
                   steps will be numbered automatically starting from 1.
     """
 
-    if not coordinates:
+    xlabel = ("Path length / Å")
+    if coordinates is None:
         coordinates = range(0, len(energies))
+        xlabel = "Scan step"
 
     fig, ax = plt.subplots()
-    plt.tight_layout()
-    ax.plot(coordinates, energies, marker="o", linestyle="-")
-    ax.set_xlabel("Scan step")
+    ax.plot(coordinates, energies, marker="o", linestyle="-", ms=4)
+    ax.set_xlabel(xlabel)
     ax.set_ylabel("E / eV")
-    plt.show()
+    plt.tight_layout()
+
+    return fig, ax

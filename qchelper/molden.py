@@ -1,4 +1,7 @@
 import re
+import textwrap
+
+import pyparsing as pp
 
 
 def get_occupations(text):
@@ -58,6 +61,45 @@ def cut_molden(text, indices):
     joined_mos = "\n".join(occ_mos)
     new_molden = header + "[MO]\n" + joined_mos
     return new_molden
+
+
+def parse_molden_mos(text):
+    """Expects everything after the [MO] tag of a .molden file."""
+    int_ = pp.Word(pp.nums).setParseAction(
+                                lambda s, loc, toks: int(toks[0])
+    )
+    float_ = pp.Word(pp.nums + ".-").setParseAction(
+                                        lambda s, loc, toks: float(toks[0])
+    )
+    ene = pp.Literal("Ene=") + float_.setResultsName("energy")
+    a_or_b = pp.Or(pp.Literal("Alpha").setResultsName("spin"),
+                   pp.Literal("Beta").setResultsName("spin"))
+    spin = pp.Literal("Spin=") + a_or_b
+    occup = pp.Literal("Occup=") + float_.setResultsName("occup")
+    ao_line = pp.Suppress(int_) + float_
+    molecular_orbital = pp.Group(ene
+                                 + spin
+                                 + occup
+                                 + pp.OneOrMore(ao_line).setResultsName("coeffs"))
+
+    parser = pp.OneOrMore(molecular_orbital)
+    mos = parser.parseString(text)
+    #mo0 = mos[0]
+    #print(mo0.energy)
+    #print(mo0.spin)
+    #print(mo0.occup)
+    #print(mo0.coeffs)
+    #print(len(mo0.coeffs))
+    return mos
+
+
+def join_parsed_mo(mo):
+    ao_line_strs = [f"{i: 5d} {coeff: 16.10f}" for i, coeff in enumerate(mo.coeffs, 1)]
+    ao_str = "\n ".join(ao_line_strs)
+    return f"""Ene=\t{mo.energy}
+    Spin= {mo.spin}
+    Occup= {mo.occup}
+    {ao_str}"""
 
 
 if __name__ == "__main__":

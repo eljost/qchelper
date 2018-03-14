@@ -4,6 +4,17 @@ from pandas import DataFrame
 import chemcoord as cc
 
 
+def get_coords_diffs(coords_list, normalize=False):
+    cds = [0, ]
+    for i in range(len(coords_list)-1):
+        diff = np.linalg.norm(coords_list[i+1]-coords_list[i])
+        cds.append(diff)
+    cds = np.cumsum(cds)
+    if normalize:
+        cds /= cds.max()
+    return cds
+
+
 def make_xyz_str(atoms, coords, comment=""):
     assert(len(atoms) == len(coords))
 
